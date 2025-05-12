@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codifier API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button, textarea {
+            padding: 10px;
+            margin: 10px;
+            width: 100%;
+            max-width: 500px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 150px;
+        }
+        .result {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Text Codifier & Decoder</h2>
+
+    <h3>Codify Text</h3>
+    <textarea id="textInput" placeholder="Enter text here to codify..."></textarea>
+    <button onclick="codifyText()">Codify</button>
+
+    <div id="codifiedResult" class="result" style="display: none;">
+        <h4>Codified Text:</h4>
+        <pre id="codifiedText"></pre>
+        <h4>Codename Map:</h4>
+        <pre id="codenameMap"></pre>
+    </div>
+
+    <h3>Decode Codified Text</h3>
+    <textarea id="codifiedInput" placeholder="Enter codified text here..."></textarea>
+    <textarea id="codenameInput" placeholder="Enter codename map (JSON format)..."></textarea>
+    <button onclick="decodeText()">Decode</button>
+
+    <div id="decodedResult" class="result" style="display: none;">
+        <h4>Decoded Text:</h4>
+        <pre id="decodedText"></pre>
+    </div>
+
+    <script>
+        const apiUrl = 'https://nounswap.onrender.com';
+
+        function codifyText() {
+            const text = document.getElementById('textInput').value;
+
+            fetch(`${apiUrl}/codify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('codifiedText').textContent = data.codified;
+                document.getElementById('codenameMap').textContent = JSON.stringify(data.map, null, 2);
+                document.getElementById('codifiedResult').style.display = 'block';
+            })
+            .catch(error => alert('Error: ' + error));
+        }
+
+        function decodeText() {
+            const codifiedText = document.getElementById('codifiedInput').value;
+            const codenameMap = JSON.parse(document.getElementById('codenameInput').value);
+
+            fetch(`${apiUrl}/decode`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: codifiedText, map: codenameMap }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('decodedText').textContent = data.decoded;
+                document.getElementById('decodedResult').style.display = 'block';
+            })
+            .catch(error => alert('Error: ' + error));
+        }
+    </script>
+
+</body>
+</html>
